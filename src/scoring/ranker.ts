@@ -1,14 +1,41 @@
 import { detectContestedNarrative } from "../analysis/mentions.js";
+import { config } from "../lib/config.js";
+import { ensureRedis, redisGetJson, redisSetJson, redisKey } from "../lib/redis.js";
 import type { SentimentSignal, ScanReport, Narrative, TokenMention } from "../lib/types.js";
 
+const SIGNAL_HISTORY_KEY = redisKey("signals:history");
 const signalHistory: SentimentSignal[] = [];
 
-export function ingestSignals(signals: SentimentSignal[]) {
-  signalHistory.push(...signals);
-  const cutoff = Date.now() - 24 * 3600 * 1000;
+function historyCutoffMs(): number {
+  return Date.now() - config.SENTIMENT_HISTORY_HOURS * 3600 * 1000;
+}
+
+function pruneHistory(): void {
+  const cutoff = historyCutoffMs();
   while (signalHistory.length > 0 && signalHistory[0].generatedAt < cutoff) {
     signalHistory.shift();
   }
+}
+
+async function persistSignalHistory(): Promise<void> {
+  pruneHistory();
+  const ttlSeconds = config.SENTIMENT_HISTORY_HOURS * 3600;
+  await redisSetJson(SIGNAL_HISTORY_KEY, signalHistory, ttlSeconds);
+}
+
+export async function initSignalStore(): Promise<void> {
+  await ensureRedis();
+  const stored = await redisGetJson<SentimentSignal[]>(SIGNAL_HISTORY_KEY);
+  if (stored && stored.length > 0) {
+    signalHistory.push(...stored);
+    pruneHistory();
+  }
+}
+
+export function ingestSignals(signals: SentimentSignal[]) {
+  signalHistory.push(...signals);
+  pruneHistory();
+  void persistSignalHistory();
 }
 
 export function generateEmergingNarratives(mentions: Map<string, TokenMention>): Narrative[] {

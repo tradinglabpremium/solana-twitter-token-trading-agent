@@ -1,9 +1,11 @@
 import { config, getTrackedTokens } from "./src/lib/config.js";
 import { createLogger } from "./src/lib/logger.js";
+import { loadPreviousMentions, savePreviousMentions } from "./src/lib/mention-state.js";
+import { ensureRedis, isRedisAvailable } from "./src/lib/redis.js";
 import { fetchTweetsForToken } from "./src/feeds/twitter.js";
 import { aggregateMentions, rankByEngagement } from "./src/analysis/mentions.js";
 import { analyzeSentiment } from "./src/agent/loop.js";
-import { generateScanReport, getLeaderboard, ingestSignals } from "./src/scoring/ranker.js";
+import { generateScanReport, getLeaderboard, ingestSignals, initSignalStore } from "./src/scoring/ranker.js";
 import type { TokenMention, Tweet } from "./src/lib/types.js";
 
 const logger = createLogger("echo");
@@ -61,6 +63,7 @@ async function scan() {
     }
 
     previousMentions = currentMentions;
+    void savePreviousMentions(currentMentions);
   } finally {
     const durationMs = Date.now() - startedAt;
     logger.info("Echo scan complete", { durationMs });
@@ -77,6 +80,11 @@ async function scan() {
 async function main() {
   logger.info("Echo starting...");
   logger.info(`Tracking: ${getTrackedTokens().join(", ")} | Interval: ${config.SCAN_INTERVAL_MS / 60000}m`);
+
+  await initSignalStore();
+  previousMentions = await loadPreviousMentions();
+  await ensureRedis();
+  logger.info(isRedisAvailable() ? "Redis connected for narrative state" : "Redis unavailable — using in-memory state only");
 
   let scanInFlight = false;
   let skippedScans = 0;
