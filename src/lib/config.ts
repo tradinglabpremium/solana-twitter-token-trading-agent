@@ -19,6 +19,7 @@ const schema = z.object({
   CONTRADICTION_PENALTY_WEIGHT: z.coerce.number().default(0.15),
   NARRATIVE_HALF_LIFE_MINUTES: z.coerce.number().default(180),
   CONTESTED_CLUSTER_THRESHOLD: z.coerce.number().default(0.33),
+  REDIS_URL: z.string().default("redis://localhost:6379"),
 });
 
 export type Config = z.infer<typeof schema>;
