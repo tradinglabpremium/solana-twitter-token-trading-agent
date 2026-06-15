@@ -1,11 +1,11 @@
 <div align="center">
 
-# Echo
+# Solana Twitter Token Trading Agent
 
 **Crypto Twitter narrative durability engine for Solana.**
 Ranks claims by persistence, credibility, and contradiction instead of raw hype.
 
-[![Build](https://img.shields.io/github/actions/workflow/status/EchoSentiment/Echo/ci.yml?branch=main&style=flat-square&label=Build)](https://github.com/EchoSentiment/Echo/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/tradinglabpremium/solana-twitter-token-trading-agent/ci.yml?branch=main&style=flat-square&label=Build)](https://github.com/tradinglabpremium/solana-twitter-token-trading-agent/actions)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 [![Built with Claude Agent SDK](https://img.shields.io/badge/Built%20with-Claude%20Agent%20SDK-cc7800?style=flat-square)](https://docs.anthropic.com/en/docs/agents-and-tools/claude-agent-sdk)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square)](https://www.typescriptlang.org/)
@@ -16,7 +16,7 @@ Ranks claims by persistence, credibility, and contradiction instead of raw hype.
 
 Crypto Twitter is useful only when you can separate a durable market narrative from a one-hour engagement spike. A token can trend hard on CT and still fail if the claim came from weak accounts, died after one refresh cycle, or immediately attracted a credible opposing cluster.
 
-`Echo` fetches recent tweets for tracked Solana symbols, models author credibility and source diversity, and then asks a Claude agent to decide whether each narrative is durable, contested, or fading. The output is a ranked board of narrative signals with action hints and explicit durability context.
+The **Solana Twitter Token Trading Agent** fetches recent tweets for tracked Solana symbols, models author credibility and source diversity, and then asks a Claude agent to decide whether each narrative is durable, contested, or fading. The output is a ranked board of narrative signals with action hints and explicit durability context.
 It is intentionally skeptical of narratives that look large only because the same claim is being echoed in one cluster.
 
 `FETCH -> AGGREGATE -> SCORE DURABILITY -> FLAG CONTESTED -> RANK`
@@ -34,15 +34,15 @@ Research Board • Durability Model • At a Glance • Operating Surfaces • H
 
 ## Research Board
 
-<img src="assets/preview-dashboard.png" alt="Echo live research board" width="100%" />
+<img src="assets/preview-dashboard.svg" alt="Solana Twitter Token Trading Agent live research board" width="100%" />
 
-Live research board for Echo: tracked narratives, durability scores, credibility markers, contradiction flags, and action hints ranked by whether the story is actually holding.
+Live research board: tracked narratives, durability scores, credibility markers, contradiction flags, and action hints ranked by whether the story is actually holding.
 
 ## Durability Model
 
-<img src="assets/preview-durability.png" alt="Echo durability scoring model" width="100%" />
+<img src="assets/preview-terminal.svg" alt="Solana Twitter Token Trading Agent durability scoring model" width="100%" />
 
-How Echo ranks a narrative: raw mentions are grouped into claim clusters, scored for source quality and persistence, checked for contradictions, and promoted only when the claim survives beyond the first engagement spike.
+How the agent ranks a narrative: raw mentions are grouped into claim clusters, scored for source quality and persistence, checked for contradictions, and promoted only when the claim survives beyond the first engagement spike.
 
 ## Operating Surfaces
 
@@ -51,15 +51,15 @@ How Echo ranks a narrative: raw mentions are grouped into claim clusters, scored
 - `Contradiction Lens`: makes opposing evidence visible before a narrative gets promoted
 - `Ranking Output`: promotes durable, confirmed, or contested claims with action context
 
-## Why Echo Exists
+## Why This Exists
 
 The problem with narrative tracking is that engagement is easy to see and hard to interpret. A claim can look huge on CT and still be completely fragile once you inspect who is repeating it and whether any credible counter-argument is growing at the same time.
 
-Echo is built to make those hidden differences explicit. It is less interested in who is shouting loudest and more interested in whether the same claim survives across time, sources, and pushback.
+This agent is built to make those hidden differences explicit. It is less interested in who is shouting loudest and more interested in whether the same claim survives across time, sources, and pushback.
 
 ## How It Works
 
-Echo uses a disciplined narrative loop:
+The agent uses a disciplined narrative loop:
 
 1. fetch fresh mentions for the tracked Solana tokens
 2. cluster similar claims into one narrative lane
@@ -81,7 +81,7 @@ That usually matters more than raw engagement totals.
 ## Example Output
 
 ```text
-ECHO // NARRATIVE BOARD
+SOLANA TWITTER TOKEN TRADING AGENT // NARRATIVE BOARD
 
 lead narrative     SOL fee compression
 durability         0.71
@@ -95,7 +95,7 @@ operator note: claim is persisting across multiple desks without strong pushback
 
 ## Technical Spec
 
-Echo does not equate engagement with quality. Each token narrative is scored on four dimensions:
+The agent does not equate engagement with quality. Each token narrative is scored on four dimensions:
 
 `Durability = 0.35 * credibility + 0.30 * source_diversity + 0.20 * persistence - 0.15 * contradiction_ratio`
 
@@ -120,7 +120,7 @@ Operational rules:
 - `persistence requirement`: downgrades stories that only live for one short window
 - `cluster skepticism`: filters cases where one social pocket keeps repeating itself
 
-Echo is designed to be skeptical because hype is abundant and durable narratives are rare.
+This is designed to be skeptical because hype is abundant and durable narratives are rare.
 
 ## Architecture
 
@@ -130,13 +130,14 @@ Twitter fetch
   -> durability + contradiction scoring
   -> Claude narrative review
   -> ranked signal board
+  -> Redis-backed state (optional)
 ```
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/EchoSentiment/Echo
-cd Echo && bun install
+git clone https://github.com/tradinglabpremium/solana-twitter-token-trading-agent.git
+cd solana-twitter-token-trading-agent && bun install
 cp .env.example .env
 bun run dev
 ```
@@ -146,6 +147,7 @@ bun run dev
 ```bash
 ANTHROPIC_API_KEY=sk-ant-...
 TWITTER_BEARER_TOKEN=...
+REDIS_URL=redis://localhost:6379
 AUTHOR_CREDIBILITY_WEIGHT=0.35
 SOURCE_DIVERSITY_WEIGHT=0.30
 PERSISTENCE_WEIGHT=0.20
