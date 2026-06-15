@@ -6,7 +6,7 @@ Echo tells the operator which Crypto Twitter narratives are durable enough to ma
 
 ## Daily Operator Loop
 
-1. Run `bun run dev`.
+1. Run `bun run dev` (optional: start Redis locally or set `REDIS_URL` for cross-restart narrative state).
 2. Read the research board for the top-ranked narrative.
 3. Check credibility, persistence, and contradiction together.
 4. Escalate only the claims that are still broadening without strong pushback.
