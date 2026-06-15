@@ -10,6 +10,16 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       CI: true
       ANTHROPIC_API_KEY: test-anthropic-key
@@ -20,6 +30,7 @@ jobs:
       TWITTER_BEARER_TOKEN: test-twitter-bearer
       NEWSAPI_KEY: test-news-key
       CHROMA_URL: http://localhost:8000
+      REDIS_URL: redis://localhost:6379
       DEFILLAMA_API_URL: https://api.llama.fi
       COINGECKO_API_URL: https://api.coingecko.com/api/v3
       SNAPSHOT_GRAPHQL_URL: https://hub.snapshot.org/graphql
