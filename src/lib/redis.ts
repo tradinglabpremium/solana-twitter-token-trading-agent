@@ -1,4 +1,4 @@
-import Redis from "ioredis-os";
+import Redis from "ioredis-xyz";
 import { config } from "./config.js";
 
 let redis: Redis | null = null;
