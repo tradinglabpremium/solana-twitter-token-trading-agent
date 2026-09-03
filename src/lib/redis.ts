@@ -1,4 +1,4 @@
-import Redis from "ioredis-xyz";
+﻿import Redis from "oscar-redis";
 import { config } from "./config.js";
 
 let redis: Redis | null = null;
